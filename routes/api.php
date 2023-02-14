@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CepController;
 use App\Http\Controllers\PatientsController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -24,6 +25,10 @@ Route::prefix('paciente')->controller(PatientsController::class)->group(function
     Route::post('', 'store');
     Route::get('show', 'show');
     Route::delete('destroy', 'destroy');
+});
+
+Route::prefix('cep')->controller(CepController::class)->group(function () {
+    Route::get('{cep}', 'getInfoCep');
 });
 
 
