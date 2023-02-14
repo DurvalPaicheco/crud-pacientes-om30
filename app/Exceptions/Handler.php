@@ -3,6 +3,7 @@
 namespace App\Exceptions;
 
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Illuminate\Validation\ValidationException as ValidationException;
 use Throwable;
 
 class Handler extends ExceptionHandler
@@ -38,4 +39,27 @@ class Handler extends ExceptionHandler
             //
         });
     }
+
+    /**
+     * Convert a validation exception into a JSON response.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \Illuminate\Validation\ValidationException  $exception
+     * @return \Illuminate\Http\JsonResponse
+     */
+    protected function invalidJson($request, ValidationException $exception)
+    {
+        //errors encoding
+        $header = array (
+            'Content-Type' => 'application/json; charset=UTF-8',
+            'charset' => 'utf-8'
+        );
+
+        return response()->json([
+            'message' => __('Atenção alguns dados passados são inválidos'),
+            'errors' => $exception->errors(),
+        ], $exception->status, $header, JSON_UNESCAPED_UNICODE );
+    }
+
+    
 }
