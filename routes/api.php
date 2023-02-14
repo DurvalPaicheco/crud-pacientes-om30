@@ -24,6 +24,8 @@ Route::prefix('paciente')->controller(PatientsController::class)->group(function
     Route::get('', 'index');
     Route::post('', 'store');
     Route::get('show', 'show');
+    Route::get('edit/{id}', 'edit');
+    Route::put('{id}', 'update');
     Route::delete('destroy', 'destroy');
 });
 
