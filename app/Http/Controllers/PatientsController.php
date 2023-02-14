@@ -8,6 +8,7 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Intervention\Image\ImageManagerStatic as Image;
 
 class PatientsController extends Controller
 {
@@ -39,7 +40,7 @@ class PatientsController extends Controller
         try {
             //sav temp data to edit with nescessary
             $data = $request->all();
-
+            
             //save picture
             if ($request->hasFile('picture')) {
                 $file = $request->file('picture');
@@ -48,7 +49,7 @@ class PatientsController extends Controller
 
                 $data['path_picture'] = $path;
             }
-
+            
             DB::beginTransaction();
 
             Patient::create($data);

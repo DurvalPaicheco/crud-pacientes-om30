@@ -77,12 +77,11 @@
                     </div>
                 </div>
                 <div class="row  container justify-content-center pt-3 ">
-                    <div class="col-lg-2">
+                    <div class="col-lg-2 text-center">
                         <button type="submit" class="btn btn-primary">Atualizar</button>
                     </div>
                     
                 </div>
-            
         </form>
     </div>
 </template>
