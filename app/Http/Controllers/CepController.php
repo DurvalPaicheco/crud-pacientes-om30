@@ -2,34 +2,29 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\ViaCepHelper;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 
 class CepController extends Controller
 {
 
+    private $header = array(
+        'Content-Type' => 'application/json; charset=UTF-8',
+        'charset' => 'utf-8'
+    );
+
     function getInfoCep($cep){
+        try{
+           $response = (new ViaCepHelper())->getCepData($cep);
 
-        $expiration = 60;//minutes
-        $key = $cep;
+           return response()->json($response, 200, $this->header, JSON_UNESCAPED_UNICODE);
+        }catch(\Exception $e){
+           
+            $message = "Error: {$e->getMessage()} , code: {$e->getCode()}, line: {$e->getLine()}";
+            Log::error('Erro ao obter dados da api cep'. $message);
 
-        return Cache::remember($key, $expiration, function() use($cep){
-            $url = "viacep.com.br/ws/$cep/json/";
-            $http = Http::timeout(60)
-                    ->acceptJson()
-                    ->get($url);
-            if($http->successful()){
-                return 
-                    [
-                        'success' => true,
-                        'error' => false,
-                        'message' => 'ok',
-                        'data' => $http->json()
-                    ];
-            }else{
-                throw new \Exception($http->getBody());
-            } 
-        });
+            return response()->json(['error' => true, 'success' => false, 'message' => __('Houve um Erro ao buscar cep, por favor tente novamente mais tarde')], 422);
+        }
     }
 }
