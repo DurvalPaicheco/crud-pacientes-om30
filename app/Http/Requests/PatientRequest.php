@@ -30,13 +30,12 @@ class PatientRequest extends FormRequest
     public function rules()
     {
         return [
-            'cpf' => 'required|cpf',
+            'cpf' => 'required|cpf|unique:patients',
             'name' => 'required',
             'picture' => 'required',
             'mother_name' => 'required',
             'birthdate' => 'required|date',
-            'cpf' => 'required',
-            'cns' => 'required|cns',
+            'cns' => 'required|cns|unique:patients',
             'street' => 'required',
             'number' => 'required',
             'neighborhood' => 'required',
@@ -63,7 +62,9 @@ class PatientRequest extends FormRequest
             'state.required' => 'O estado é um campo obrigatório',
             'cep.required' => 'O CEP é um campo obrigatório',
             'cpf.cpf' => 'CPF(Cadastro de Pessoas Físicas) inválido',
-            'cpf.cns' => 'CNS(Cartão Nacional de Saúde) inválido',
+            'cns.cns' => 'CNS(Cartão Nacional de Saúde) inválido',
+            'cns.unique' => 'CNS(Cartão Nacional de Saúde) já cadastrado',
+            'cpf.unique' => 'CPF(Cadastro de Pessoas Físicas) já cadastrado',
         ];
     }
 
