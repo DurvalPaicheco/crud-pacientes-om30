@@ -16,9 +16,13 @@ Instalação:
 
 3.Instale as dependências
 
-    composer install && npm install
+    composer install && npm install 
 
-4.Rode o container
+4.Crie o link simbólico 
+
+    composer artisan storage:link
+
+5.Rode o container
 
     docker-compose up -d --build
 
