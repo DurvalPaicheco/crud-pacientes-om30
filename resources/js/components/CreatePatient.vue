@@ -60,7 +60,7 @@
                 <div class="row ">
                     <div class="col-md-3 mt-2">
                         <div class="form-group">
-                            <label>zip_code</label>
+                            <label>Cep</label>
                             <input :id="'zip_code'" @change="searchZipCode($event)" type="text"
                                 class="form-control" v-mask="'#####-###'" v-model="patient.address.zip_code">
                         </div>

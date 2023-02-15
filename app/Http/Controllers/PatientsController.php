@@ -171,7 +171,6 @@ class PatientsController extends Controller
 
             return response()->json(['error' => false, 'success' => true, 'message' => __('Paciente editado com sucesso!')]);
         } catch (\Exception $e) {
-            dd($e);
             DB::rollBack();
             $message = "Error: {$e->getMessage()} , code: {$e->getCode()}, line: {$e->getLine()}";
             Log::error('Error ao editar paciente : ' . $message);
