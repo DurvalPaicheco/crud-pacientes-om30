@@ -51,6 +51,9 @@ import axios from 'axios';
 import { routes } from './routes';
 import VueSweetalert2 from 'vue-sweetalert2';
 import 'sweetalert2/dist/sweetalert2.min.css';
+import 'vue-instant/dist/vue-instant.css';
+import VueInstant from 'vue-instant'
+
 /**
  * Next, we will create a fresh Vue application instance and attach it to
  * the page. Then, you may begin adding components to this application
@@ -60,6 +63,7 @@ Vue.use(VueRouter);
 Vue.use(VueAxios, axios);
 Vue.use(VueMask);
 Vue.use(VueSweetalert2);
+
  
 const router = new VueRouter({
     mode: 'history',

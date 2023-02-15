@@ -6,7 +6,7 @@
                 <thead class="thead-dark">
                 <tr>
                     <th width="10%">ID</th>
-                    <th width="40%">Name</th>
+                    <th width="40%">Nome</th>
                     <th width="20%">Status</th>
                     <th width="30%">Ações</th>
                 </tr>
@@ -32,12 +32,14 @@
         </div>
     </div>
 </template>
- 
 <script>
+    
+    
     export default {
+        
         data() {
             return {
-                patients: []
+                patients: [],
             }
         },
         created() {
@@ -63,7 +65,18 @@
                     this.$swal(message, errors, 'info');
                 });
         },
+        computed: {
+            getId: function () {              
+            alert(this.$ref.frmCompanyInput.id);
+            },
+            getValue: function () {
+            alert(this.$ref.frmCompanyInput.value);
+            }
+        },
         methods: {
+            selectItem(item) {
+                this.selectItem = item;
+            },
             inactivePatient(id) { 
                 this.axios
                     .delete(`http://127.0.0.1:8080/api/paciente/${id}`)
