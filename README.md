@@ -1,7 +1,5 @@
 # crud-pacientes-om30
 crud-pacientes-om30
-<<<<<<< HEAD
-=======
 
 
 CRUD para gerencamento de pacientes.
@@ -33,4 +31,3 @@ Instalação:
 ######  O arquivo de rotas(endpoint.json) se encontra na raiz do projeto.
 
 ###### The smallest heading Também é possivél editar configurações do nginx na pasta files/default.conf.  
->>>>>>> 106b62764f2d208c09ae04c61443d0d956299b2c
