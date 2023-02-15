@@ -1,3 +1,3 @@
 #!/bin/sh
-cd /app  
+cd /usr/share/nginx/  
 php artisan migrate:fresh --seed
