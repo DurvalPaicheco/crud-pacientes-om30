@@ -14,9 +14,9 @@ Instalação:
 
     cp .env.example .env
 
-3.Instale as dependências
+3.Instale as dependências 
 
-    composer install && npm install 
+    composer install && npm install && npm run build dev
 
 4.Crie o link simbólico 
 
