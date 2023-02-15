@@ -2,28 +2,30 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\PatientRequest;
+use App\Http\Requests\PatientCreateRequest;
+use App\Http\Requests\PatientEditRequest;
 use App\Models\Patient;
+use App\Models\PatientAddress;
+use App\Repositories\PatientRepository;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Intervention\Image\ImageManagerStatic as Image;
 
 class PatientsController extends Controller
 {
-    private $header = array(
+    private $header = [
         'Content-Type' => 'application/json; charset=UTF-8',
-        'charset' => 'utf-8'
-    );
+        'charset' => 'utf-8',
+    ];
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $patients = Patient::where('deleted', false)->get();
+        $patients = PatientRepository::getPatients($request);
 
         return response()->json($patients);
     }
@@ -34,13 +36,12 @@ class PatientsController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(PatientRequest $request)
+    public function store(PatientCreateRequest $request)
     {
-
         try {
             //sav temp data to edit with nescessary
             $data = $request->all();
-            
+
             //save picture
             if ($request->hasFile('picture')) {
                 $file = $request->file('picture');
@@ -49,12 +50,32 @@ class PatientsController extends Controller
 
                 $data['path_picture'] = $path;
             }
-            
+
             DB::beginTransaction();
 
-            Patient::create($data);
+            $patient = Patient::create([
+                'name' => $data['name'],
+                'mother_name' => $data['mother_name'],
+                'birthdate' => Carbon::createFromFormat('d/m/Y', $data['birthdate'])->format('Y-m-d'),
+                'cpf' => $data['cpf'],
+                'cns' => $data['cns'],
+                'path_picture' => $data['path_picture'],
+            ]);
+
+            $address = $data['address'];
+            $patientAddress = PatientAddress::create([
+                'zip_code' => $address['zip_code'],
+                'street' => $address['street'],
+                'number' => $address['number'],
+                'complement' => $address['complement'],
+                'neighborhood' => $address['neighborhood'],
+                'city' => $address['city'],
+                'state' => $address['state'],
+                'patient_id' => $patient->id,
+            ]);
 
             DB::commit();
+
             return response()->json(['error' => false, 'success' => true, 'message' => __('Paciente cadastrado com sucesso!')], 200, $this->header, JSON_UNESCAPED_UNICODE);
         } catch (\Exception $e) {
             $oldPath = storage_path("app/{$data['path_picture']}");
@@ -63,7 +84,7 @@ class PatientsController extends Controller
             $message = "Error: {$e->getMessage()} , code: {$e->getCode()}, line: {$e->getLine()}";
             Log::error('Error ao cadastrar paciente : ' . $message);
 
-            return response()->json(['error' => true, 'success' => false, 'message' => __('Houve um Erro ao cadastrar Paciente, por favor tente novamente mais tarde')], 422);
+            return response()->json(['error' => true, 'success' => false, 'message' => __('Houve um Erro ao cadastrar Paciente, por favor tente novamente mais tarde'), 'errors' => []], 422);
         }
     }
 
@@ -80,7 +101,7 @@ class PatientsController extends Controller
         return response()->json($patient);
     }
 
-     /**
+    /**
      * Show the form for editing the specified resource.
      *
      * @param  int  $id
@@ -88,11 +109,16 @@ class PatientsController extends Controller
      */
     public function edit($id)
     {
-        $patient = Patient::find($id);
+        $patient = Patient::with('address')->find($id);
 
+        /**
+         * Convert to locate-BR , not use mutator
+         */
+        if ($patient->birthdate) {
+            $patient->birthdate = Carbon::createFromFormat('Y-m-d', $patient->birthdate)->format('d/m/Y');
+        }
         return response()->json($patient);
     }
-
 
     /**
      * Update the specified resource in storage.
@@ -101,12 +127,9 @@ class PatientsController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(PatientRequest $request, $id)
+    public function update(Request $request, $id)
     {
-
         try {
-            DB::beginTransaction();
-
             $patient = Patient::find($id);
 
             //sav temp data to edit with nescessary
@@ -121,9 +144,34 @@ class PatientsController extends Controller
                 $data['path_picture'] = $url;
             }
 
-            $patient->update($data);
+            DB::beginTransaction();
+
+            $patient->update([
+                'name' => $data['name'],
+                'mother_name' => $data['mother_name'],
+                'birthdate' => Carbon::createFromFormat('d/m/Y', $data['birthdate'])->format('Y-m-d'),
+                'cpf' => $data['cpf'],
+                'cns' => $data['cns'],
+                'path_picture' => $data['path_picture'],
+            ]);
+
+           
+            $address = $data['address'];
+            $patient->address()->update([
+                'zip_code' => $address['zip_code'],
+                'street' => $address['street'],
+                'number' => $address['number'],
+                'complement' => $address['complement'],
+                'neighborhood' => $address['neighborhood'],
+                'city' => $address['city'],
+                'state' => $address['state'],
+                'patient_id' => $patient->id,
+            ]);
+            DB::commit();
+
             return response()->json(['error' => false, 'success' => true, 'message' => __('Paciente editado com sucesso!')]);
         } catch (\Exception $e) {
+            dd($e);
             DB::rollBack();
             $message = "Error: {$e->getMessage()} , code: {$e->getCode()}, line: {$e->getLine()}";
             Log::error('Error ao editar paciente : ' . $message);

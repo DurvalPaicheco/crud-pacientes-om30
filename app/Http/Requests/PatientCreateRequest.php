@@ -8,7 +8,7 @@ use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\ValidationException;
 
-class PatientRequest extends FormRequest
+class PatientCreateRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -34,15 +34,14 @@ class PatientRequest extends FormRequest
             'name' => 'required',
             'picture' => 'required',
             'mother_name' => 'required',
-            'birthdate' => 'required|date',
+            'birthdate' => 'required|date_format:d/m/Y',
             'cns' => 'required|cns|unique:patients',
-            'street' => 'required',
-            'number' => 'required',
-            'neighborhood' => 'required',
-            'city' => 'required',
-            'state' => 'required',
-            'city' => 'required',
-            'cep' => 'required',
+            'address.street' => 'required',
+            'address.number' => 'required',
+            'address.neighborhood' => 'required',
+            'address.state' => 'required',
+            'address.city' => 'required',
+            'address.zip_code' => 'required',
         ];
     }
 
@@ -55,12 +54,12 @@ class PatientRequest extends FormRequest
             'mother_name.required' => 'O nome da mãe é um campo obrigatório',
             'birthdate.required' => 'A data de nascimento é um campo obrigatório',
             'cns.required' => 'O CNS(Cartão Nacional de Saúde) é um campo obrigatório',
-            'street.required' => 'A rua é um campo obrigatório',
-            'number.required' => 'O número é um campo obrigatório',
-            'neighborhood.required' => 'O bairro é um campo obrigatório',
-            'city.required' => 'A cidade é um campo obrigatório',
-            'state.required' => 'O estado é um campo obrigatório',
-            'cep.required' => 'O CEP é um campo obrigatório',
+            'address.street.required' => 'A rua é um campo obrigatório',
+            'address.number.required' => 'O número é um campo obrigatório',
+            'address.neighborhood.required' => 'O bairro é um campo obrigatório',
+            'address.city.required' => 'A cidade é um campo obrigatório',
+            'address.state.required' => 'O estado é um campo obrigatório',
+            'address.zip_code.required' => 'O CEP é um campo obrigatório',
             'cpf.cpf' => 'CPF(Cadastro de Pessoas Físicas) inválido',
             'cns.cns' => 'CNS(Cartão Nacional de Saúde) inválido',
             'cns.unique' => 'CNS(Cartão Nacional de Saúde) já cadastrado',

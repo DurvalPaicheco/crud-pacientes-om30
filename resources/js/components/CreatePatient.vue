@@ -1,15 +1,18 @@
 <template>
     <div>
         <h3 class="text-center">Adicionar novo Paciente</h3>
-        <form @submit.prevent="addpPatient">
+        <form @submit.prevent="addPatient">
             <div class="row  container justify-content-center pt-3 w-100">
                 <div class="col-lg-2">
-                    <img  width="250px" height="150px" id="preview" v-if="url_picture" :src="url_picture"  class="rounded-circle">
-                    <svg v-show="showTempSvg" id="photo_profile" class="rounded-circle" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M24 20.993V24H0v-2.996A14.977 14.977 0 0112.004 15c4.904 0 9.26 2.354 11.996 5.993zM16.002 8.999a4 4 0 11-8 0 4 4 0 018 0z" />
+                    <img width="250px" height="150px" id="preview" v-if="patient.url_picture" :src="patient.url_picture"
+                        class="rounded-circle">
+                    <svg v-show="showTempSvg" id="photo_profile" class="rounded-circle" fill="currentColor"
+                        viewBox="0 0 24 24">
+                        <path
+                            d="M24 20.993V24H0v-2.996A14.977 14.977 0 0112.004 15c4.904 0 9.26 2.354 11.996 5.993zM16.002 8.999a4 4 0 11-8 0 4 4 0 018 0z" />
                     </svg>
                     <div class="pt-3">
-                        <input :id="'picture'" @change="changePhoto($event)" type="file">                   
+                        <input :id="'picture'" @change="changePhoto($event)" type="file">
                     </div>
                 </div>
             </div>
@@ -21,7 +24,7 @@
                             <input type="text" class="form-control" v-model="patient.name">
                         </div>
                     </div>
-                    
+
                     <div class="col-md-3 mt-2">
                         <div class="form-group">
                             <label>Nome da Mãe</label>
@@ -32,7 +35,7 @@
                     <div class="col-md-2 mt-2">
                         <div class="form-group">
                             <label>Data Nascimento</label>
-                            <date-picker v-mask="'####-##-##'" v-model="time1" valueType="format"></date-picker>
+                            <date-picker  v-model="patient.birthdate" valueType="format" format="DD/MM/YYYY"></date-picker>
                         </div>
                     </div>
 
@@ -57,44 +60,47 @@
                 <div class="row ">
                     <div class="col-md-3 mt-2">
                         <div class="form-group">
-                            <label>Cep</label>
-                            <input :id="'cep'" @change="searchCep($event)" type="text" class="form-control" v-mask="'#####-###'" v-model="patient.cep">
+                            <label>zip_code</label>
+                            <input :id="'zip_code'" @change="searchZipCode($event)" type="text"
+                                class="form-control" v-mask="'#####-###'" v-model="patient.address.zip_code">
                         </div>
                     </div>
                     <div class="col-md-3 mt-2">
                         <div class="form-group">
                             <label>Cidade</label>
-                            <input :id="'city'" type="text" class="form-control" v-model="patient.city">
+                            <input :id="'city'" type="text" class="form-control" v-model="patient.address.city">
                         </div>
                     </div>
                     <div class="col-md-3 mt-2">
                         <div class="form-group">
                             <label>Cidade</label>
-                            <input :id="'state'" type="text" class="form-control" v-model="patient.state">
+                            <input :id="'state'" type="text" class="form-control" v-model="patient.address.state">
                         </div>
                     </div>
                     <div class="col-md-3 mt-2">
                         <div class="form-group">
                             <label>Rua</label>
-                            <input :id="'street'" type="text" class="form-control" v-model="patient.street">
-                        </div>
-                    </div>
-                    <div class="col-md-3 mt-2">
-                        <div class="form-group">
-                            <label>Bairro</label>
-                            <input :id="'neithbodhood'" type="text" class="form-control" v-model="patient.neighborhood">
+                            <input :id="'street'" type="text" class="form-control" v-model="patient.address.street">
                         </div>
                     </div>
                     <div class="col-md-3 mt-2">
                         <div class="form-group">
                             <label>Número</label>
-                            <input :id="'number'" type="text" class="form-control" v-model="patient.number">
+                            <input :id="'number'" type="text" class="form-control" v-model="patient.address.number">
+                        </div>
+                    </div>
+                    <div class="col-md-3 mt-2">
+                        <div class="form-group">
+                            <label>Bairro</label>
+                            <input :id="'neighborhood'" type="text" class="form-control"
+                                v-model="patient.address.neighborhood">
                         </div>
                     </div>
                     <div class="col-md-3 mt-2">
                         <div class="form-group">
                             <label>Complemento</label>
-                            <input :id="'complement'" type="text" class="form-control" v-model="patient.complement">
+                            <input :id="'complement'" type="text" class="form-control"
+                                v-model="patient.complement">
                         </div>
                     </div>
                 </div>
@@ -103,36 +109,40 @@
                 <div class="col-lg-2 text-center">
                     <button type="submit" class="btn btn-primary">Salvar</button>
                 </div>
-                
+
             </div>
         </form>
     </div>
 </template>
- 
+
 <script>
     import DatePicker from 'vue2-datepicker';
     import 'vue2-datepicker/index.css';
 
     export default {
-        components: { DatePicker },
+        components: {
+            DatePicker
+        },
         data() {
             return {
                 patient: {
-                    'street' : '',
-                    'name' : '',
-                    'state': '',
-                    'mother_name' : '',
-                    'birthdate' : '',
-                    'cpf' : '',
-                    'cns' : '',
-                    'cep' : '',
-                    'city' : '',
-                    'street' : '',
-                    'neithbodhood' : '',
-                    'number' : '',
-                    'complement' : '',
+                    'street': '',
+                    'url_picture' : '',
+                    'name': '',
+                    'mother_name': '',
+                    'birthdate': '',
+                    'cpf': '',
+                    'cns': '',
                     'picture': '',
-                   
+                    'address' : {
+                        'zip_code': '',
+                        'city': '',
+                        'street': '',
+                        'neighborhood': '',
+                        'number': '',
+                        'complement': '',
+                        'state': '',
+                    }
                 },
                 url_picture: '',
                 showTempSvg: true,
@@ -140,58 +150,65 @@
             }
         },
         methods: {
-            addpPatient() {
+            addPatient() {
                 let data = new FormData();
-                data.append('picture', this.patient.picture);
+                
+                //loop through object and load form data
+                Object.entries(this.patient).forEach(([key, value]) => {
+                    data.append(`${key}`, value);
+                });
 
+                Object.entries(this.patient.address).forEach(([key, value]) => {
+                    data.append(`address[${key}]`, value);
+                });
+               
                 this.axios
                     .post('http://localhost:8000/api/paciente', data, {
                         headers: {
-                            'Content-Type': `multipart/form-data32323`,
+                            'Content-Type': `multipart/form-data`,
                         }
                     })
                     .then(response => {
-                        console.log(response.data)
-                        if(response.status === 200){
-
-                        }else{
-                            console.log('erro');
-                            return;
-                            
+                        if (response.status === 200) {
+                            let data = response.data;
+                            this.$swal(data.message,'',  'success').then(response => {
+                                this.$router.push({ name: 'home' })
+                            });
                         } 
-                        console.log('aq');
-                        //this.$router.push({ name: 'home' })
                     })
                     .catch(err => {
-                        if(err.response.status == 422) {
-                            let message = err.response.data.message;
-                            Object.entries(err.response.data.errors).forEach(([key, error]) => {
-                                error.map((message) => {
-                                    console.log(message);
+                        let message = err.response.data.message;
+                        let errors = '';
+                        if (err.response.status == 422) {
+                            if(err.response.data.errors){
+                                Object.entries(err.response.data.errors).forEach(([key, error]) => {
+                                    error.map((message) => {
+                                        errors += `${message}<br>`;
+                                    });
                                 });
-                            });
-                            
+                            }
+
                         }
+
+                        this.$swal(message, errors, 'info');
                     })
-                    .finally(function(data){
+                    .finally(function(data) {
                         console.log(data);
                     })
-
-                    
             },
 
-            searchCep(event){
-                let response =  this.axios
-                    .get(`http://localhost:8000/api/cep/${this.patient.cep}`)
+            searchZipCode(event) {
+                let response = this.axios
+                    .get(`http://localhost:8000/api/cep/${this.patient.address.zip_code}`)
                     .then(response => {
-                        if(response.status === 200){
+                        if (response.status === 200) {
                             let data = response.data.data;
-                            this.patient.street = data.logradouro;
-                            this.patient.complement = data.complemento;
-                            this.patient.neithbodhood = data.bairro;
-                            this.patient.city = data.localidade;
-                            this.patient.state = data.uf;
-                        }else{
+                            this.patient.address.street = data.logradouro;
+                            this.patient.address.complement = data.complemento;
+                            this.patient.address.neighborhood = data.bairro;
+                            this.patient.address.city = data.localidade;
+                            this.patient.address.state = data.uf;
+                        } else {
 
                         }
                     })
@@ -200,10 +217,10 @@
 
                 console.log(response);
             },
-            changePhoto(event){
+            changePhoto(event) {
                 const file = event.target.files[0];
                 this.patient.picture = event.target.files[0];
-                this.url_picture = URL.createObjectURL(file);
+                this.patient.url_picture = URL.createObjectURL(file);
                 this.showTempSvg = false;
             }
 

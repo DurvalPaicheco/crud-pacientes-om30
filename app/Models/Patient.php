@@ -18,17 +18,21 @@ class Patient extends Model
         'birthdate',
         'cpf',
         'cns',
-        'cep',
-        'street',
-        'street',
-        'number',
-        'complement',
-        'neighborhood',
-        'city', 
-        'state',
         'path_picture',
         'deleted',
         'deleted_at',
-        'path_picutre'
+        'updated_at',
     ];
+
+    protected $appends = [
+        'url_picture'
+    ];
+
+    public function getUrlPictureAttribute(){
+        return url('storage/'.$this->path_picture);
+    }
+
+    public function address(){
+        return $this->hasOne(PatientAddress::class);
+    }
 }

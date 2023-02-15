@@ -5368,16 +5368,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var vue2_datepicker__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vue2-datepicker */ "./node_modules/vue2-datepicker/index.esm.js");
 /* harmony import */ var vue2_datepicker_index_css__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! vue2-datepicker/index.css */ "./node_modules/vue2-datepicker/index.css");
-function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
 function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
 function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
 function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
 function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i]; return arr2; }
 function _iterableToArrayLimit(arr, i) { var _i = null == arr ? null : "undefined" != typeof Symbol && arr[Symbol.iterator] || arr["@@iterator"]; if (null != _i) { var _s, _e, _x, _r, _arr = [], _n = !0, _d = !1; try { if (_x = (_i = _i.call(arr)).next, 0 === i) { if (Object(_i) !== _i) return; _n = !1; } else for (; !(_n = (_s = _x.call(_i)).done) && (_arr.push(_s.value), _arr.length !== i); _n = !0); } catch (err) { _d = !0, _e = err; } finally { try { if (!_n && null != _i["return"] && (_r = _i["return"](), Object(_r) !== _r)) return; } finally { if (_d) throw _e; } } return _arr; } }
 function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
-function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
-function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
 
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
@@ -5385,78 +5381,104 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
     DatePicker: vue2_datepicker__WEBPACK_IMPORTED_MODULE_0__["default"]
   },
   data: function data() {
-    var _patient;
     return {
-      patient: (_patient = {
+      patient: {
         'street': '',
+        'url_picture': '',
         'name': '',
-        'state': '',
         'mother_name': '',
         'birthdate': '',
         'cpf': '',
         'cns': '',
-        'cep': '',
-        'city': ''
-      }, _defineProperty(_patient, "street", ''), _defineProperty(_patient, 'neithbodhood', ''), _defineProperty(_patient, 'number', ''), _defineProperty(_patient, 'complement', ''), _defineProperty(_patient, 'picture', ''), _patient),
+        'picture': '',
+        'address': {
+          'zip_code': '',
+          'city': '',
+          'street': '',
+          'neighborhood': '',
+          'number': '',
+          'complement': '',
+          'state': ''
+        }
+      },
       url_picture: '',
       showTempSvg: true,
       time1: null
     };
   },
   methods: {
-    addpPatient: function addpPatient() {
+    addPatient: function addPatient() {
+      var _this = this;
       var data = new FormData();
-      data.append('picture', this.patient.picture);
+
+      //loop through object and load form data
+      Object.entries(this.patient).forEach(function (_ref) {
+        var _ref2 = _slicedToArray(_ref, 2),
+          key = _ref2[0],
+          value = _ref2[1];
+        data.append("".concat(key), value);
+      });
+      Object.entries(this.patient.address).forEach(function (_ref3) {
+        var _ref4 = _slicedToArray(_ref3, 2),
+          key = _ref4[0],
+          value = _ref4[1];
+        data.append("address[".concat(key, "]"), value);
+      });
       this.axios.post('http://localhost:8000/api/paciente', data, {
         headers: {
-          'Content-Type': "multipart/form-data32323"
+          'Content-Type': "multipart/form-data"
         }
       }).then(function (response) {
-        console.log(response.data);
-        if (response.status === 200) {} else {
-          console.log('erro');
-          return;
-        }
-        console.log('aq');
-        //this.$router.push({ name: 'home' })
-      })["catch"](function (err) {
-        if (err.response.status == 422) {
-          var message = err.response.data.message;
-          Object.entries(err.response.data.errors).forEach(function (_ref) {
-            var _ref2 = _slicedToArray(_ref, 2),
-              key = _ref2[0],
-              error = _ref2[1];
-            error.map(function (message) {
-              console.log(message);
+        if (response.status === 200) {
+          var _data = response.data;
+          _this.$swal(_data.message, '', 'success').then(function (response) {
+            _this.$router.push({
+              name: 'home'
             });
           });
         }
+      })["catch"](function (err) {
+        var message = err.response.data.message;
+        var errors = '';
+        if (err.response.status == 422) {
+          if (err.response.data.errors) {
+            Object.entries(err.response.data.errors).forEach(function (_ref5) {
+              var _ref6 = _slicedToArray(_ref5, 2),
+                key = _ref6[0],
+                error = _ref6[1];
+              error.map(function (message) {
+                errors += "".concat(message, "<br>");
+              });
+            });
+          }
+        }
+        _this.$swal(message, errors, 'info');
       })["finally"](function (data) {
         console.log(data);
       });
     },
-    searchCep: function searchCep(event) {
-      var _this = this;
-      var response = this.axios.get("http://localhost:8000/api/cep/".concat(this.patient.cep)).then(function (response) {
+    searchZipCode: function searchZipCode(event) {
+      var _this2 = this;
+      var response = this.axios.get("http://localhost:8000/api/cep/".concat(this.patient.address.zip_code)).then(function (response) {
         if (response.status === 200) {
           var data = response.data.data;
-          _this.patient.street = data.logradouro;
-          _this.patient.complement = data.complemento;
-          _this.patient.neithbodhood = data.bairro;
-          _this.patient.city = data.localidade;
-          _this.patient.state = data.uf;
+          _this2.patient.address.street = data.logradouro;
+          _this2.patient.address.complement = data.complemento;
+          _this2.patient.address.neighborhood = data.bairro;
+          _this2.patient.address.city = data.localidade;
+          _this2.patient.address.state = data.uf;
         } else {}
       })["catch"](function (err) {
         return console.log(err);
       })["finally"](function () {
-        return _this.loading = false;
+        return _this2.loading = false;
       });
       console.log(response);
     },
     changePhoto: function changePhoto(event) {
       var file = event.target.files[0];
       this.patient.picture = event.target.files[0];
-      this.url_picture = URL.createObjectURL(file);
+      this.patient.url_picture = URL.createObjectURL(file);
       this.showTempSvg = false;
     }
   }
@@ -5477,6 +5499,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var vue2_datepicker__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vue2-datepicker */ "./node_modules/vue2-datepicker/index.esm.js");
 /* harmony import */ var vue2_datepicker_index_css__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! vue2-datepicker/index.css */ "./node_modules/vue2-datepicker/index.css");
+function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
+function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i]; return arr2; }
+function _iterableToArrayLimit(arr, i) { var _i = null == arr ? null : "undefined" != typeof Symbol && arr[Symbol.iterator] || arr["@@iterator"]; if (null != _i) { var _s, _e, _x, _r, _arr = [], _n = !0, _d = !1; try { if (_x = (_i = _i.call(arr)).next, 0 === i) { if (Object(_i) !== _i) return; _n = !1; } else for (; !(_n = (_s = _x.call(_i)).done) && (_arr.push(_s.value), _arr.length !== i); _n = !0); } catch (err) { _d = !0, _e = err; } finally { try { if (!_n && null != _i["return"] && (_r = _i["return"](), Object(_r) !== _r)) return; } finally { if (_d) throw _e; } } return _arr; } }
+function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
@@ -5485,24 +5513,121 @@ __webpack_require__.r(__webpack_exports__);
   },
   data: function data() {
     return {
-      patient: {},
-      time1: null
+      patient: {
+        'street': '',
+        'url_picture': '',
+        'name': '',
+        'mother_name': '',
+        'birthdate': '',
+        'cpf': '',
+        'cns': '',
+        'picture': '',
+        'address': {
+          'zip_code': '',
+          'city': '',
+          'street': '',
+          'neighborhood': '',
+          'number': '',
+          'complement': '',
+          'state': ''
+        }
+      },
+      url_picture: '',
+      showTempSvg: true
     };
   },
   created: function created() {
     var _this = this;
     this.axios.get("http://localhost:8000/api/paciente/edit/".concat(this.$route.params.id)).then(function (res) {
       _this.patient = res.data;
+      //if has picture hide temp Image
+      if (res.data.url_picture) {
+        _this.showTempSvg = false;
+      }
     });
   },
   methods: {
-    updateProduct: function updateProduct() {
+    updatePatient: function updatePatient() {
       var _this2 = this;
-      this.axios.put("http://localhost:8000/api/paciente/".concat(this.$route.params.id), this.patient).then(function (res) {
-        _this2.$router.push({
-          name: 'home'
-        });
+      var data = new FormData();
+
+      //loop through object and load form data
+      Object.entries(this.patient).forEach(function (_ref) {
+        var _ref2 = _slicedToArray(_ref, 2),
+          key = _ref2[0],
+          value = _ref2[1];
+        data.append("".concat(key), value);
       });
+      Object.entries(this.patient.address).forEach(function (_ref3) {
+        var _ref4 = _slicedToArray(_ref3, 2),
+          key = _ref4[0],
+          value = _ref4[1];
+        data.append("address[".concat(key, "]"), value);
+      });
+
+      /**
+       * Need se manually _method=PUT, becouse put not aczip_codet form-data
+       * end in this route need pass picture...
+       */
+      this.axios.post("http://localhost:8000/api/paciente/".concat(this.patient.id, "?_method=PUT"), data, {
+        headers: {
+          'Content-Type': "multipart/form-data"
+        }
+      }).then(function (response) {
+        if (response.status === 200) {
+          var _data = response.data;
+          _this2.$swal(_data.message, '', 'success').then(function (response) {
+            _this2.$router.push({
+              name: 'home'
+            });
+          });
+        }
+      })["catch"](function (err) {
+        var message = err.response.data.message;
+        var errors = '';
+        if (err.response.status == 422) {
+          if (err.response.data.errors) {
+            Object.entries(err.response.data.errors).forEach(function (_ref5) {
+              var _ref6 = _slicedToArray(_ref5, 2),
+                key = _ref6[0],
+                error = _ref6[1];
+              error.map(function (message) {
+                errors += "".concat(message, "<br>");
+              });
+            });
+          }
+        }
+        _this2.$swal(message, errors, 'info');
+      })["finally"](function (data) {
+        console.log(data);
+      });
+    },
+    searchZipCode: function searchZipCode(event) {
+      var _this3 = this;
+      var response = this.axios.get("http://localhost:8000/api/zip_code/".concat(this.patient.zip_code)).then(function (response) {
+        if (response.status === 200) {
+          var _data2 = response.data.data;
+          _this3.patient.address.street = _data2.logradouro;
+          _this3.patient.address.complement = _data2.complemento;
+          _this3.patient.address.neighborhood = _data2.bairro;
+          _this3.patient.address.city = _data2.localidade;
+          _this3.patient.address.state = _data2.uf;
+        }
+      })["catch"](function (err) {
+        _this3.patient.address.street = data.logradouro;
+        _this3.patient.address.complement = data.complemento;
+        _this3.patient.address.neighborhood = data.bairro;
+        _this3.patient.address.city = data.localidade;
+        _this3.patient.address.state = data.uf;
+      })["finally"](function () {
+        return _this3.loading = false;
+      });
+    },
+    changePhoto: function changePhoto(event) {
+      var file = event.target.files[0];
+      this.patient.picture = event.target.files[0];
+      this.patient.url_picture = URL.createObjectURL(file);
+      this.showTempSvg = false;
     }
   }
 });
@@ -5632,20 +5757,20 @@ var render = function render() {
     on: {
       submit: function submit($event) {
         $event.preventDefault();
-        return _vm.addpPatient.apply(null, arguments);
+        return _vm.addPatient.apply(null, arguments);
       }
     }
   }, [_c("div", {
     staticClass: "row container justify-content-center pt-3 w-100"
   }, [_c("div", {
     staticClass: "col-lg-2"
-  }, [_vm.url_picture ? _c("img", {
+  }, [_vm.patient.url_picture ? _c("img", {
     staticClass: "rounded-circle",
     attrs: {
       width: "250px",
       height: "150px",
       id: "preview",
-      src: _vm.url_picture
+      src: _vm.patient.url_picture
     }
   }) : _vm._e(), _vm._v(" "), _c("svg", {
     directives: [{
@@ -5733,21 +5858,410 @@ var render = function render() {
   }, [_c("div", {
     staticClass: "form-group"
   }, [_c("label", [_vm._v("Data Nascimento")]), _vm._v(" "), _c("date-picker", {
+    attrs: {
+      valueType: "format",
+      format: "DD/MM/YYYY"
+    },
+    model: {
+      value: _vm.patient.birthdate,
+      callback: function callback($$v) {
+        _vm.$set(_vm.patient, "birthdate", $$v);
+      },
+      expression: "patient.birthdate"
+    }
+  })], 1)]), _vm._v(" "), _c("div", {
+    staticClass: "col-md-3 mt-2"
+  }, [_c("div", {
+    staticClass: "form-group"
+  }, [_c("label", [_vm._v("Cpf")]), _vm._v(" "), _c("input", {
     directives: [{
       name: "mask",
       rawName: "v-mask",
-      value: "####-##-##",
-      expression: "'####-##-##'"
+      value: "###.###.###-##",
+      expression: "'###.###.###-##'"
+    }, {
+      name: "model",
+      rawName: "v-model",
+      value: _vm.patient.cpf,
+      expression: "patient.cpf"
     }],
+    staticClass: "form-control",
     attrs: {
-      valueType: "format"
+      type: "text"
+    },
+    domProps: {
+      value: _vm.patient.cpf
+    },
+    on: {
+      input: function input($event) {
+        if ($event.target.composing) return;
+        _vm.$set(_vm.patient, "cpf", $event.target.value);
+      }
+    }
+  })])]), _vm._v(" "), _c("div", {
+    staticClass: "col-md-3 mt-2"
+  }, [_c("div", {
+    staticClass: "form-group"
+  }, [_c("label", [_vm._v("CNS")]), _vm._v(" "), _c("input", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.patient.cns,
+      expression: "patient.cns"
+    }],
+    staticClass: "form-control",
+    attrs: {
+      type: "text"
+    },
+    domProps: {
+      value: _vm.patient.cns
+    },
+    on: {
+      input: function input($event) {
+        if ($event.target.composing) return;
+        _vm.$set(_vm.patient, "cns", $event.target.value);
+      }
+    }
+  })])])])]), _vm._v(" "), _c("hr"), _vm._v(" "), _c("h3", [_vm._v("Endereço")]), _vm._v(" "), _c("div", {
+    staticClass: "col-md-12"
+  }, [_c("div", {
+    staticClass: "row"
+  }, [_c("div", {
+    staticClass: "col-md-3 mt-2"
+  }, [_c("div", {
+    staticClass: "form-group"
+  }, [_c("label", [_vm._v("zip_code")]), _vm._v(" "), _c("input", {
+    directives: [{
+      name: "mask",
+      rawName: "v-mask",
+      value: "#####-###",
+      expression: "'#####-###'"
+    }, {
+      name: "model",
+      rawName: "v-model",
+      value: _vm.patient.address.zip_code,
+      expression: "patient.address.zip_code"
+    }],
+    staticClass: "form-control",
+    attrs: {
+      id: "zip_code",
+      type: "text"
+    },
+    domProps: {
+      value: _vm.patient.address.zip_code
+    },
+    on: {
+      change: function change($event) {
+        return _vm.searchZipCode($event);
+      },
+      input: function input($event) {
+        if ($event.target.composing) return;
+        _vm.$set(_vm.patient.address, "zip_code", $event.target.value);
+      }
+    }
+  })])]), _vm._v(" "), _c("div", {
+    staticClass: "col-md-3 mt-2"
+  }, [_c("div", {
+    staticClass: "form-group"
+  }, [_c("label", [_vm._v("Cidade")]), _vm._v(" "), _c("input", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.patient.address.city,
+      expression: "patient.address.city"
+    }],
+    staticClass: "form-control",
+    attrs: {
+      id: "city",
+      type: "text"
+    },
+    domProps: {
+      value: _vm.patient.address.city
+    },
+    on: {
+      input: function input($event) {
+        if ($event.target.composing) return;
+        _vm.$set(_vm.patient.address, "city", $event.target.value);
+      }
+    }
+  })])]), _vm._v(" "), _c("div", {
+    staticClass: "col-md-3 mt-2"
+  }, [_c("div", {
+    staticClass: "form-group"
+  }, [_c("label", [_vm._v("Cidade")]), _vm._v(" "), _c("input", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.patient.address.state,
+      expression: "patient.address.state"
+    }],
+    staticClass: "form-control",
+    attrs: {
+      id: "state",
+      type: "text"
+    },
+    domProps: {
+      value: _vm.patient.address.state
+    },
+    on: {
+      input: function input($event) {
+        if ($event.target.composing) return;
+        _vm.$set(_vm.patient.address, "state", $event.target.value);
+      }
+    }
+  })])]), _vm._v(" "), _c("div", {
+    staticClass: "col-md-3 mt-2"
+  }, [_c("div", {
+    staticClass: "form-group"
+  }, [_c("label", [_vm._v("Rua")]), _vm._v(" "), _c("input", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.patient.address.street,
+      expression: "patient.address.street"
+    }],
+    staticClass: "form-control",
+    attrs: {
+      id: "street",
+      type: "text"
+    },
+    domProps: {
+      value: _vm.patient.address.street
+    },
+    on: {
+      input: function input($event) {
+        if ($event.target.composing) return;
+        _vm.$set(_vm.patient.address, "street", $event.target.value);
+      }
+    }
+  })])]), _vm._v(" "), _c("div", {
+    staticClass: "col-md-3 mt-2"
+  }, [_c("div", {
+    staticClass: "form-group"
+  }, [_c("label", [_vm._v("Número")]), _vm._v(" "), _c("input", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.patient.address.number,
+      expression: "patient.address.number"
+    }],
+    staticClass: "form-control",
+    attrs: {
+      id: "number",
+      type: "text"
+    },
+    domProps: {
+      value: _vm.patient.address.number
+    },
+    on: {
+      input: function input($event) {
+        if ($event.target.composing) return;
+        _vm.$set(_vm.patient.address, "number", $event.target.value);
+      }
+    }
+  })])]), _vm._v(" "), _c("div", {
+    staticClass: "col-md-3 mt-2"
+  }, [_c("div", {
+    staticClass: "form-group"
+  }, [_c("label", [_vm._v("Bairro")]), _vm._v(" "), _c("input", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.patient.address.neighborhood,
+      expression: "patient.address.neighborhood"
+    }],
+    staticClass: "form-control",
+    attrs: {
+      id: "neighborhood",
+      type: "text"
+    },
+    domProps: {
+      value: _vm.patient.address.neighborhood
+    },
+    on: {
+      input: function input($event) {
+        if ($event.target.composing) return;
+        _vm.$set(_vm.patient.address, "neighborhood", $event.target.value);
+      }
+    }
+  })])]), _vm._v(" "), _c("div", {
+    staticClass: "col-md-3 mt-2"
+  }, [_c("div", {
+    staticClass: "form-group"
+  }, [_c("label", [_vm._v("Complemento")]), _vm._v(" "), _c("input", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.patient.complement,
+      expression: "patient.complement"
+    }],
+    staticClass: "form-control",
+    attrs: {
+      id: "complement",
+      type: "text"
+    },
+    domProps: {
+      value: _vm.patient.complement
+    },
+    on: {
+      input: function input($event) {
+        if ($event.target.composing) return;
+        _vm.$set(_vm.patient, "complement", $event.target.value);
+      }
+    }
+  })])])])]), _vm._v(" "), _vm._m(0)])]);
+};
+var staticRenderFns = [function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "row container justify-content-center pt-3"
+  }, [_c("div", {
+    staticClass: "col-lg-2 text-center"
+  }, [_c("button", {
+    staticClass: "btn btn-primary",
+    attrs: {
+      type: "submit"
+    }
+  }, [_vm._v("Salvar")])])]);
+}];
+render._withStripped = true;
+
+
+/***/ }),
+
+/***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/EditPatient.vue?vue&type=template&id=6bc9cb00&":
+/*!*****************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/EditPatient.vue?vue&type=template&id=6bc9cb00& ***!
+  \*****************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "render": () => (/* binding */ render),
+/* harmony export */   "staticRenderFns": () => (/* binding */ staticRenderFns)
+/* harmony export */ });
+var render = function render() {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", [_c("h3", {
+    staticClass: "text-center"
+  }, [_vm._v("Edição de Paciente")]), _vm._v(" "), _c("form", {
+    on: {
+      submit: function submit($event) {
+        $event.preventDefault();
+        return _vm.updatePatient.apply(null, arguments);
+      }
+    }
+  }, [_c("div", {
+    staticClass: "row container justify-content-center pt-3 w-100"
+  }, [_c("div", {
+    staticClass: "col-lg-2"
+  }, [_vm.patient.url_picture ? _c("img", {
+    staticClass: "rounded-circle",
+    attrs: {
+      width: "250px",
+      height: "150px",
+      id: "preview",
+      src: _vm.patient.url_picture
+    }
+  }) : _vm._e(), _vm._v(" "), _c("svg", {
+    directives: [{
+      name: "show",
+      rawName: "v-show",
+      value: _vm.showTempSvg,
+      expression: "showTempSvg"
+    }],
+    staticClass: "rounded-circle",
+    attrs: {
+      id: "photo_profile",
+      fill: "currentColor",
+      viewBox: "0 0 24 24"
+    }
+  }, [_c("path", {
+    attrs: {
+      d: "M24 20.993V24H0v-2.996A14.977 14.977 0 0112.004 15c4.904 0 9.26 2.354 11.996 5.993zM16.002 8.999a4 4 0 11-8 0 4 4 0 018 0z"
+    }
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "pt-3"
+  }, [_c("input", {
+    attrs: {
+      id: "picture",
+      type: "file"
+    },
+    on: {
+      change: function change($event) {
+        return _vm.changePhoto($event);
+      }
+    }
+  })])])]), _vm._v(" "), _c("div", {
+    staticClass: "col-md-12"
+  }, [_c("div", {
+    staticClass: "row"
+  }, [_c("div", {
+    staticClass: "col-md-3 mt-2"
+  }, [_c("div", {
+    staticClass: "form-group"
+  }, [_c("label", [_vm._v("Nome Completo")]), _vm._v(" "), _c("input", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.patient.name,
+      expression: "patient.name"
+    }],
+    staticClass: "form-control",
+    attrs: {
+      type: "text"
+    },
+    domProps: {
+      value: _vm.patient.name
+    },
+    on: {
+      input: function input($event) {
+        if ($event.target.composing) return;
+        _vm.$set(_vm.patient, "name", $event.target.value);
+      }
+    }
+  })])]), _vm._v(" "), _c("div", {
+    staticClass: "col-md-3 mt-2"
+  }, [_c("div", {
+    staticClass: "form-group"
+  }, [_c("label", [_vm._v("Nome da Mãe")]), _vm._v(" "), _c("input", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.patient.mother_name,
+      expression: "patient.mother_name"
+    }],
+    staticClass: "form-control",
+    attrs: {
+      type: "text"
+    },
+    domProps: {
+      value: _vm.patient.mother_name
+    },
+    on: {
+      input: function input($event) {
+        if ($event.target.composing) return;
+        _vm.$set(_vm.patient, "mother_name", $event.target.value);
+      }
+    }
+  })])]), _vm._v(" "), _c("div", {
+    staticClass: "col-md-2 mt-2"
+  }, [_c("div", {
+    staticClass: "form-group"
+  }, [_c("label", [_vm._v("Data Nascimento")]), _vm._v(" "), _c("date-picker", {
+    attrs: {
+      valueType: "format",
+      format: "DD/MM/YYYY"
     },
     model: {
-      value: _vm.time1,
+      value: _vm.patient.birthdate,
       callback: function callback($$v) {
-        _vm.time1 = $$v;
+        _vm.$set(_vm.patient, "birthdate", $$v);
       },
-      expression: "time1"
+      expression: "patient.birthdate"
     }
   })], 1)]), _vm._v(" "), _c("div", {
     staticClass: "col-md-3 mt-2"
@@ -5819,24 +6333,24 @@ var render = function render() {
     }, {
       name: "model",
       rawName: "v-model",
-      value: _vm.patient.cep,
-      expression: "patient.cep"
+      value: _vm.patient.address.zip_code,
+      expression: "patient.address.zip_code"
     }],
     staticClass: "form-control",
     attrs: {
-      id: "cep",
+      id: "zip_code",
       type: "text"
     },
     domProps: {
-      value: _vm.patient.cep
+      value: _vm.patient.address.zip_code
     },
     on: {
       change: function change($event) {
-        return _vm.searchCep($event);
+        return _vm.searchZipCode($event);
       },
       input: function input($event) {
         if ($event.target.composing) return;
-        _vm.$set(_vm.patient, "cep", $event.target.value);
+        _vm.$set(_vm.patient.address, "zip_code", $event.target.value);
       }
     }
   })])]), _vm._v(" "), _c("div", {
@@ -5847,8 +6361,8 @@ var render = function render() {
     directives: [{
       name: "model",
       rawName: "v-model",
-      value: _vm.patient.city,
-      expression: "patient.city"
+      value: _vm.patient.address.city,
+      expression: "patient.address.city"
     }],
     staticClass: "form-control",
     attrs: {
@@ -5856,12 +6370,12 @@ var render = function render() {
       type: "text"
     },
     domProps: {
-      value: _vm.patient.city
+      value: _vm.patient.address.city
     },
     on: {
       input: function input($event) {
         if ($event.target.composing) return;
-        _vm.$set(_vm.patient, "city", $event.target.value);
+        _vm.$set(_vm.patient.address, "city", $event.target.value);
       }
     }
   })])]), _vm._v(" "), _c("div", {
@@ -5872,8 +6386,8 @@ var render = function render() {
     directives: [{
       name: "model",
       rawName: "v-model",
-      value: _vm.patient.state,
-      expression: "patient.state"
+      value: _vm.patient.address.state,
+      expression: "patient.address.state"
     }],
     staticClass: "form-control",
     attrs: {
@@ -5881,12 +6395,12 @@ var render = function render() {
       type: "text"
     },
     domProps: {
-      value: _vm.patient.state
+      value: _vm.patient.address.state
     },
     on: {
       input: function input($event) {
         if ($event.target.composing) return;
-        _vm.$set(_vm.patient, "state", $event.target.value);
+        _vm.$set(_vm.patient.address, "state", $event.target.value);
       }
     }
   })])]), _vm._v(" "), _c("div", {
@@ -5897,8 +6411,8 @@ var render = function render() {
     directives: [{
       name: "model",
       rawName: "v-model",
-      value: _vm.patient.street,
-      expression: "patient.street"
+      value: _vm.patient.address.street,
+      expression: "patient.address.street"
     }],
     staticClass: "form-control",
     attrs: {
@@ -5906,37 +6420,12 @@ var render = function render() {
       type: "text"
     },
     domProps: {
-      value: _vm.patient.street
+      value: _vm.patient.address.street
     },
     on: {
       input: function input($event) {
         if ($event.target.composing) return;
-        _vm.$set(_vm.patient, "street", $event.target.value);
-      }
-    }
-  })])]), _vm._v(" "), _c("div", {
-    staticClass: "col-md-3 mt-2"
-  }, [_c("div", {
-    staticClass: "form-group"
-  }, [_c("label", [_vm._v("Bairro")]), _vm._v(" "), _c("input", {
-    directives: [{
-      name: "model",
-      rawName: "v-model",
-      value: _vm.patient.neighborhood,
-      expression: "patient.neighborhood"
-    }],
-    staticClass: "form-control",
-    attrs: {
-      id: "neithbodhood",
-      type: "text"
-    },
-    domProps: {
-      value: _vm.patient.neighborhood
-    },
-    on: {
-      input: function input($event) {
-        if ($event.target.composing) return;
-        _vm.$set(_vm.patient, "neighborhood", $event.target.value);
+        _vm.$set(_vm.patient.address, "street", $event.target.value);
       }
     }
   })])]), _vm._v(" "), _c("div", {
@@ -5947,8 +6436,8 @@ var render = function render() {
     directives: [{
       name: "model",
       rawName: "v-model",
-      value: _vm.patient.number,
-      expression: "patient.number"
+      value: _vm.patient.address.number,
+      expression: "patient.address.number"
     }],
     staticClass: "form-control",
     attrs: {
@@ -5956,250 +6445,12 @@ var render = function render() {
       type: "text"
     },
     domProps: {
-      value: _vm.patient.number
+      value: _vm.patient.address.number
     },
     on: {
       input: function input($event) {
         if ($event.target.composing) return;
-        _vm.$set(_vm.patient, "number", $event.target.value);
-      }
-    }
-  })])]), _vm._v(" "), _c("div", {
-    staticClass: "col-md-3 mt-2"
-  }, [_c("div", {
-    staticClass: "form-group"
-  }, [_c("label", [_vm._v("Complemento")]), _vm._v(" "), _c("input", {
-    directives: [{
-      name: "model",
-      rawName: "v-model",
-      value: _vm.patient.complement,
-      expression: "patient.complement"
-    }],
-    staticClass: "form-control",
-    attrs: {
-      id: "complement",
-      type: "text"
-    },
-    domProps: {
-      value: _vm.patient.complement
-    },
-    on: {
-      input: function input($event) {
-        if ($event.target.composing) return;
-        _vm.$set(_vm.patient, "complement", $event.target.value);
-      }
-    }
-  })])])])]), _vm._v(" "), _vm._m(0)])]);
-};
-var staticRenderFns = [function () {
-  var _vm = this,
-    _c = _vm._self._c;
-  return _c("div", {
-    staticClass: "row container justify-content-center pt-3"
-  }, [_c("div", {
-    staticClass: "col-lg-2 text-center"
-  }, [_c("button", {
-    staticClass: "btn btn-primary",
-    attrs: {
-      type: "submit"
-    }
-  }, [_vm._v("Salvar")])])]);
-}];
-render._withStripped = true;
-
-
-/***/ }),
-
-/***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/EditPatient.vue?vue&type=template&id=6bc9cb00&":
-/*!*****************************************************************************************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/EditPatient.vue?vue&type=template&id=6bc9cb00& ***!
-  \*****************************************************************************************************************************************************************************************************************************************************************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "render": () => (/* binding */ render),
-/* harmony export */   "staticRenderFns": () => (/* binding */ staticRenderFns)
-/* harmony export */ });
-var render = function render() {
-  var _vm = this,
-    _c = _vm._self._c;
-  return _c("div", [_c("h3", {
-    staticClass: "text-center"
-  }, [_vm._v("Edit Product")]), _vm._v(" "), _c("form", {
-    staticClass: "form-inlin",
-    on: {
-      submit: function submit($event) {
-        $event.preventDefault();
-        return _vm.updateProduct.apply(null, arguments);
-      }
-    }
-  }, [_c("div", {
-    staticClass: "col-md-12"
-  }, [_c("div", {
-    staticClass: "row"
-  }, [_c("div", {
-    staticClass: "col-md-3 mt-2"
-  }, [_c("div", {
-    staticClass: "form-group"
-  }, [_c("label", [_vm._v("Nome Completo")]), _vm._v(" "), _c("input", {
-    directives: [{
-      name: "model",
-      rawName: "v-model",
-      value: _vm.patient.name,
-      expression: "patient.name"
-    }],
-    staticClass: "form-control",
-    attrs: {
-      type: "text"
-    },
-    domProps: {
-      value: _vm.patient.name
-    },
-    on: {
-      input: function input($event) {
-        if ($event.target.composing) return;
-        _vm.$set(_vm.patient, "name", $event.target.value);
-      }
-    }
-  })])]), _vm._v(" "), _c("div", {
-    staticClass: "col-md-3 mt-2"
-  }, [_c("div", {
-    staticClass: "form-group"
-  }, [_c("label", [_vm._v("Nome da Mãe")]), _vm._v(" "), _c("input", {
-    directives: [{
-      name: "model",
-      rawName: "v-model",
-      value: _vm.patient.mother_name,
-      expression: "patient.mother_name"
-    }],
-    staticClass: "form-control",
-    attrs: {
-      type: "text"
-    },
-    domProps: {
-      value: _vm.patient.mother_name
-    },
-    on: {
-      input: function input($event) {
-        if ($event.target.composing) return;
-        _vm.$set(_vm.patient, "mother_name", $event.target.value);
-      }
-    }
-  })])]), _vm._v(" "), _c("div", {
-    staticClass: "col-md-2 mt-2"
-  }, [_c("div", {
-    staticClass: "form-group"
-  }, [_c("label", [_vm._v("Data Nascimento")]), _vm._v(" "), _c("date-picker", {
-    attrs: {
-      valueType: "format"
-    },
-    model: {
-      value: _vm.patient.birthdate,
-      callback: function callback($$v) {
-        _vm.$set(_vm.patient, "birthdate", $$v);
-      },
-      expression: "patient.birthdate"
-    }
-  })], 1)]), _vm._v(" "), _c("div", {
-    staticClass: "col-md-3 mt-2"
-  }, [_c("div", {
-    staticClass: "form-group"
-  }, [_c("label", [_vm._v("Cpf")]), _vm._v(" "), _c("input", {
-    directives: [{
-      name: "model",
-      rawName: "v-model",
-      value: _vm.patient.cpf,
-      expression: "patient.cpf"
-    }],
-    staticClass: "form-control",
-    attrs: {
-      type: "text"
-    },
-    domProps: {
-      value: _vm.patient.cpf
-    },
-    on: {
-      input: function input($event) {
-        if ($event.target.composing) return;
-        _vm.$set(_vm.patient, "cpf", $event.target.value);
-      }
-    }
-  })])]), _vm._v(" "), _c("div", {
-    staticClass: "col-md-3 mt-2"
-  }, [_c("div", {
-    staticClass: "form-group"
-  }, [_c("label", [_vm._v("CNS")]), _vm._v(" "), _c("input", {
-    directives: [{
-      name: "model",
-      rawName: "v-model",
-      value: _vm.patient.cns,
-      expression: "patient.cns"
-    }],
-    staticClass: "form-control",
-    attrs: {
-      type: "text"
-    },
-    domProps: {
-      value: _vm.patient.cns
-    },
-    on: {
-      input: function input($event) {
-        if ($event.target.composing) return;
-        _vm.$set(_vm.patient, "cns", $event.target.value);
-      }
-    }
-  })])])])]), _vm._v(" "), _c("hr"), _vm._v(" "), _c("h3", [_vm._v("Endereço")]), _vm._v(" "), _c("div", {
-    staticClass: "col-md-12"
-  }, [_c("div", {
-    staticClass: "row"
-  }, [_c("div", {
-    staticClass: "col-md-3 mt-2"
-  }, [_c("div", {
-    staticClass: "form-group"
-  }, [_c("label", [_vm._v("Cidade")]), _vm._v(" "), _c("input", {
-    directives: [{
-      name: "model",
-      rawName: "v-model",
-      value: _vm.patient.city,
-      expression: "patient.city"
-    }],
-    staticClass: "form-control",
-    attrs: {
-      type: "text"
-    },
-    domProps: {
-      value: _vm.patient.city
-    },
-    on: {
-      input: function input($event) {
-        if ($event.target.composing) return;
-        _vm.$set(_vm.patient, "city", $event.target.value);
-      }
-    }
-  })])]), _vm._v(" "), _c("div", {
-    staticClass: "col-md-3 mt-2"
-  }, [_c("div", {
-    staticClass: "form-group"
-  }, [_c("label", [_vm._v("Rua")]), _vm._v(" "), _c("input", {
-    directives: [{
-      name: "model",
-      rawName: "v-model",
-      value: _vm.patient.street,
-      expression: "patient.street"
-    }],
-    staticClass: "form-control",
-    attrs: {
-      type: "text"
-    },
-    domProps: {
-      value: _vm.patient.street
-    },
-    on: {
-      input: function input($event) {
-        if ($event.target.composing) return;
-        _vm.$set(_vm.patient, "street", $event.target.value);
+        _vm.$set(_vm.patient.address, "number", $event.target.value);
       }
     }
   })])]), _vm._v(" "), _c("div", {
@@ -6210,44 +6461,21 @@ var render = function render() {
     directives: [{
       name: "model",
       rawName: "v-model",
-      value: _vm.patient.neighborhood,
-      expression: "patient.neighborhood"
+      value: _vm.patient.address.neighborhood,
+      expression: "patient.address.neighborhood"
     }],
     staticClass: "form-control",
     attrs: {
+      id: "neighborhood",
       type: "text"
     },
     domProps: {
-      value: _vm.patient.neighborhood
+      value: _vm.patient.address.neighborhood
     },
     on: {
       input: function input($event) {
         if ($event.target.composing) return;
-        _vm.$set(_vm.patient, "neighborhood", $event.target.value);
-      }
-    }
-  })])]), _vm._v(" "), _c("div", {
-    staticClass: "col-md-3 mt-2"
-  }, [_c("div", {
-    staticClass: "form-group"
-  }, [_c("label", [_vm._v("Número")]), _vm._v(" "), _c("input", {
-    directives: [{
-      name: "model",
-      rawName: "v-model",
-      value: _vm.patient.number,
-      expression: "patient.number"
-    }],
-    staticClass: "form-control",
-    attrs: {
-      type: "text"
-    },
-    domProps: {
-      value: _vm.patient.number
-    },
-    on: {
-      input: function input($event) {
-        if ($event.target.composing) return;
-        _vm.$set(_vm.patient, "number", $event.target.value);
+        _vm.$set(_vm.patient.address, "neighborhood", $event.target.value);
       }
     }
   })])]), _vm._v(" "), _c("div", {
@@ -6258,20 +6486,21 @@ var render = function render() {
     directives: [{
       name: "model",
       rawName: "v-model",
-      value: _vm.patient.complement,
-      expression: "patient.complement"
+      value: _vm.patient.address.complement,
+      expression: "patient.address.complement"
     }],
     staticClass: "form-control",
     attrs: {
+      id: "complement",
       type: "text"
     },
     domProps: {
-      value: _vm.patient.complement
+      value: _vm.patient.address.complement
     },
     on: {
       input: function input($event) {
         if ($event.target.composing) return;
-        _vm.$set(_vm.patient, "complement", $event.target.value);
+        _vm.$set(_vm.patient.address, "complement", $event.target.value);
       }
     }
   })])])])]), _vm._v(" "), _vm._m(0)])]);
