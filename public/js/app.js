@@ -5328,6 +5328,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
+function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i]; return arr2; }
+function _iterableToArrayLimit(arr, i) { var _i = null == arr ? null : "undefined" != typeof Symbol && arr[Symbol.iterator] || arr["@@iterator"]; if (null != _i) { var _s, _e, _x, _r, _arr = [], _n = !0, _d = !1; try { if (_x = (_i = _i.call(arr)).next, 0 === i) { if (Object(_i) !== _i) return; _n = !1; } else for (; !(_n = (_s = _x.call(_i)).done) && (_arr.push(_s.value), _arr.length !== i); _n = !0); } catch (err) { _d = !0, _e = err; } finally { try { if (!_n && null != _i["return"] && (_r = _i["return"](), Object(_r) !== _r)) return; } finally { if (_d) throw _e; } } return _arr; } }
+function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   data: function data() {
     return {
@@ -5336,18 +5342,93 @@ __webpack_require__.r(__webpack_exports__);
   },
   created: function created() {
     var _this = this;
-    this.axios.get('http://localhost:8000/api/paciente/').then(function (response) {
+    this.axios.get('http://127.0.0.1:8080/api/paciente/').then(function (response) {
       _this.patients = response.data;
+    })["catch"](function (err) {
+      var message = err.response.data.message;
+      var errors = '';
+      if (err.response.status == 422) {
+        if (err.response.data.errors) {
+          Object.entries(err.response.data.errors).forEach(function (_ref) {
+            var _ref2 = _slicedToArray(_ref, 2),
+              key = _ref2[0],
+              error = _ref2[1];
+            error.map(function (message) {
+              errors += "".concat(message, "<br>");
+            });
+          });
+        }
+      }
+      _this.$swal(message, errors, 'info');
     });
   },
   methods: {
-    deletepatient: function deletepatient(id) {
+    inactivePatient: function inactivePatient(id) {
       var _this2 = this;
-      this.axios["delete"]("http://localhost:8000/api/paciente/".concat(id)).then(function (response) {
-        var i = _this2.patients.map(function (data) {
-          return data.id;
-        }).indexOf(id);
-        _this2.patients.splice(i, 1);
+      this.axios["delete"]("http://127.0.0.1:8080/api/paciente/".concat(id)).then(function (response) {
+        // let i = this.patients.map(data => data.id).indexOf(id);
+        // this.patients.splice(i, 1)
+        if (response.status === 200) {
+          var data = response.data;
+          _this2.$swal(data.message, '', 'success').then(function (response) {
+            _this2.$router.push({
+              name: 'home'
+            });
+          });
+        }
+      })["catch"](function (err) {
+        var message = err.response.data.message;
+        var errors = '';
+        if (err.response.status == 422) {
+          if (err.response.data.errors) {
+            Object.entries(err.response.data.errors).forEach(function (_ref3) {
+              var _ref4 = _slicedToArray(_ref3, 2),
+                key = _ref4[0],
+                error = _ref4[1];
+              error.map(function (message) {
+                errors += "".concat(message, "<br>");
+              });
+            });
+          }
+        }
+        _this2.$swal(message, errors, 'info');
+      });
+      this.getPatients();
+    },
+    activatePatient: function activatePatient(id) {
+      var _this3 = this;
+      this.axios.post("http://127.0.0.1:8080/api/paciente/activate/".concat(id)).then(function (response) {
+        if (response.status === 200) {
+          var data = response.data;
+          _this3.$swal(data.message, '', 'success').then(function (response) {
+            _this3.$router.push({
+              name: 'home'
+            });
+          });
+        }
+      })["catch"](function (err) {
+        var message = err.response.data.message;
+        var errors = '';
+        if (err.response.status == 422) {
+          if (err.response.data.errors) {
+            Object.entries(err.response.data.errors).forEach(function (_ref5) {
+              var _ref6 = _slicedToArray(_ref5, 2),
+                key = _ref6[0],
+                error = _ref6[1];
+              error.map(function (message) {
+                errors += "".concat(message, "<br>");
+              });
+            });
+          }
+        }
+        _this3.$swal(message, errors, 'info');
+      });
+      this.getPatients();
+    },
+    getPatients: function getPatients() {
+      var _this4 = this;
+      this.axios.get('http://127.0.0.1:8080/api/paciente/').then(function (response) {
+        _this4.patients = response.data;
       });
     }
   }
@@ -5424,7 +5505,7 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
           value = _ref4[1];
         data.append("address[".concat(key, "]"), value);
       });
-      this.axios.post('http://localhost:8000/api/paciente', data, {
+      this.axios.post('http://127.0.0.1/api/paciente', data, {
         headers: {
           'Content-Type': "multipart/form-data"
         }
@@ -5459,7 +5540,7 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
     },
     searchZipCode: function searchZipCode(event) {
       var _this2 = this;
-      var response = this.axios.get("http://localhost:8000/api/cep/".concat(this.patient.address.zip_code)).then(function (response) {
+      var response = this.axios.get("http://127.0.0.1/api/cep/".concat(this.patient.address.zip_code)).then(function (response) {
         if (response.status === 200) {
           var data = response.data.data;
           _this2.patient.address.street = data.logradouro;
@@ -5538,7 +5619,7 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
   },
   created: function created() {
     var _this = this;
-    this.axios.get("http://localhost:8000/api/paciente/edit/".concat(this.$route.params.id)).then(function (res) {
+    this.axios.get("http://127.0.0.1:8080/api/paciente/edit/".concat(this.$route.params.id)).then(function (res) {
       _this.patient = res.data;
       //if has picture hide temp Image
       if (res.data.url_picture) {
@@ -5569,7 +5650,7 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
        * Need se manually _method=PUT, becouse put not aczip_codet form-data
        * end in this route need pass picture...
        */
-      this.axios.post("http://localhost:8000/api/paciente/".concat(this.patient.id, "?_method=PUT"), data, {
+      this.axios.post("http://127.0.0.1:8080/api/paciente/".concat(this.patient.id, "?_method=PUT"), data, {
         headers: {
           'Content-Type': "multipart/form-data"
         }
@@ -5604,7 +5685,7 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
     },
     searchZipCode: function searchZipCode(event) {
       var _this3 = this;
-      var response = this.axios.get("http://localhost:8000/api/zip_code/".concat(this.patient.zip_code)).then(function (response) {
+      var response = this.axios.get("http://127.0.0.1/api/cep/".concat(this.patient.address.zip_code)).then(function (response) {
         if (response.status === 200) {
           var _data2 = response.data.data;
           _this3.patient.address.street = _data2.logradouro;
@@ -5696,17 +5777,28 @@ var render = function render() {
     _c = _vm._self._c;
   return _c("div", [_c("h2", {
     staticClass: "text-center"
-  }, [_vm._v("Listagem de Pacientes")]), _vm._v(" "), _c("table", {
-    staticClass: "table"
+  }, [_vm._v("Listagem de Pacientes")]), _vm._v(" "), _c("div", {
+    staticClass: "table-responsive-lg"
+  }, [_c("table", {
+    staticClass: "table table-striped"
   }, [_vm._m(0), _vm._v(" "), _c("tbody", _vm._l(_vm.patients, function (patient) {
     return _c("tr", {
       key: patient.id
-    }, [_c("td", [_vm._v(_vm._s(patient.id))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(patient.name))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(patient.detail))]), _vm._v(" "), _c("td", [_c("div", {
-      staticClass: "btn-group",
+    }, [_c("td", {}, [_vm._v(_vm._s(patient.id))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(patient.name))]), _vm._v(" "), _c("td", [patient.deleted === true ? _c("span", {
+      staticClass: "badge badge-secondary",
+      staticStyle: {
+        "background-color": "red"
+      }
+    }, [_vm._v("Inativo")]) : _vm._e(), _vm._v(" "), patient.deleted === false ? _c("span", {
+      staticClass: "badge badge-secondary",
+      staticStyle: {
+        "background-color": "green"
+      }
+    }, [_vm._v("Ativo")]) : _vm._e()]), _vm._v(" "), _c("td", [_c("div", {
       attrs: {
         role: "group"
       }
-    }, [_c("router-link", {
+    }, [patient.deleted === false ? _c("router-link", {
       staticClass: "btn btn-success",
       attrs: {
         to: {
@@ -5716,20 +5808,45 @@ var render = function render() {
           }
         }
       }
-    }, [_vm._v("Edit")]), _vm._v(" "), _c("button", {
+    }, [_vm._v("Edit")]) : _vm._e(), _vm._v(" "), patient.deleted === false ? _c("button", {
       staticClass: "btn btn-danger",
       on: {
         click: function click($event) {
-          return _vm.deletepatient(patient.id);
+          return _vm.inactivePatient(patient.id);
         }
       }
-    }, [_vm._v("Delete")])], 1)])]);
-  }), 0)])]);
+    }, [_vm._v("Inativar")]) : _vm._e(), _vm._v(" "), patient.deleted === true ? _c("button", {
+      staticClass: "btn btn-info",
+      on: {
+        click: function click($event) {
+          return _vm.activatePatient(patient.id);
+        }
+      }
+    }, [_vm._v("Ativar")]) : _vm._e()], 1)])]);
+  }), 0)])])]);
 };
 var staticRenderFns = [function () {
   var _vm = this,
     _c = _vm._self._c;
-  return _c("thead", [_c("tr", [_c("th", [_vm._v("ID")]), _vm._v(" "), _c("th", [_vm._v("Name")]), _vm._v(" "), _c("th", [_vm._v("Detail")]), _vm._v(" "), _c("th", [_vm._v("Ações")])])]);
+  return _c("thead", {
+    staticClass: "thead-dark"
+  }, [_c("tr", [_c("th", {
+    attrs: {
+      width: "10%"
+    }
+  }, [_vm._v("ID")]), _vm._v(" "), _c("th", {
+    attrs: {
+      width: "40%"
+    }
+  }, [_vm._v("Name")]), _vm._v(" "), _c("th", {
+    attrs: {
+      width: "20%"
+    }
+  }, [_vm._v("Status")]), _vm._v(" "), _c("th", {
+    attrs: {
+      width: "30%"
+    }
+  }, [_vm._v("Ações")])])]);
 }];
 render._withStripped = true;
 

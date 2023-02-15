@@ -127,7 +127,7 @@ class PatientsController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(PatientEditRequest $request, $id)
     {
         try {
             $patient = Patient::find($id);
@@ -181,7 +181,7 @@ class PatientsController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Inactivate the specified resource from storage.
      *
      * @param  int  $id
      * @return \Illuminate\Http\Response
@@ -195,13 +195,38 @@ class PatientsController extends Controller
             $patient->update(['deleted' => true, 'deleted_at' => Carbon::now()->format('Y-m-d H:i:s')]);
             DB::commit();
 
-            return response()->json(['error' => false, 'success' => true, 'message' => __('Paciente deletado com sucesso!')]);
+            return response()->json(['error' => false, 'success' => true, 'message' => __('Paciente Inativado com sucesso!')]);
         } catch (\Exception $e) {
             DB::rollBack();
             $message = "Error: {$e->getMessage()} , code: {$e->getCode()}, line: {$e->getLine()}";
             Log::error('Error ao deletar/inativar paciente : ' . $message);
 
             return response()->json(['error' => true, 'success' => false, 'message' => __('Houve um Erro ao deletar/inativar Paciente, por favor tente novamente mais tarde')], 422);
+        }
+    }
+
+    /**
+     * Activate the specified resource from storage.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function activate($id)
+    {
+        $patient = Patient::find($id);
+
+        try {
+            DB::beginTransaction();
+            $patient->update(['deleted' => false, 'deleted_at' => null]);
+            DB::commit();
+
+            return response()->json(['error' => false, 'success' => true, 'message' => __('Paciente Ativado com sucesso!')]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            $message = "Error: {$e->getMessage()} , code: {$e->getCode()}, line: {$e->getLine()}";
+            Log::error('Error ao deletar/inativar paciente : ' . $message);
+
+            return response()->json(['error' => true, 'success' => false, 'message' => __('Houve um Erro ao ativar Paciente, por favor tente novamente mais tarde')], 422);
         }
     }
 }

@@ -147,7 +147,7 @@
         },
         created() {
             this.axios
-                .get(`http://localhost:8000/api/paciente/edit/${this.$route.params.id}`)
+                .get(`http://127.0.0.1:8080/api/paciente/edit/${this.$route.params.id}`)
                 .then((res) => {
                     this.patient = res.data;
                     //if has picture hide temp Image
@@ -175,7 +175,7 @@
                  * end in this route need pass picture...
                  */
                 this.axios
-                    .post(`http://localhost:8000/api/paciente/${this.patient.id}?_method=PUT`, data, {
+                    .post(`http://127.0.0.1:8080/api/paciente/${this.patient.id}?_method=PUT`, data, {
                         headers: {
                             'Content-Type': `multipart/form-data`,
                         }
@@ -210,7 +210,7 @@
             },
             searchZipCode(event) {
                 let response = this.axios
-                    .get(`http://localhost:8000/api/zip_code/${this.patient.zip_code}`)
+                    .get(`http://127.0.0.1/api/cep/${this.patient.address.zip_code}`)
                     .then(response => {
                         if (response.status === 200) {
                             let data = response.data.data;

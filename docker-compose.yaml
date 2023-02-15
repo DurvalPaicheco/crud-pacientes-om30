@@ -1,0 +1,35 @@
+version: '3.1'
+
+services:
+  laravel-app:
+    build: .
+    ports:
+      - "8080:80"
+    volumes:
+      - ./:/usr/share/nginx 
+    networks:
+      - app-network
+  redis:
+    image: redis:7.0.8
+    ports:
+      - "6302:6379"
+    volumes:
+      - .docker/redis/:/data
+    networks:
+      - app-network
+  postgsql-app:
+    image: postgres
+    ports:
+      - "5454:5432"
+    volumes:
+      - .docker/dbdata:/var/lib/postgresql/data
+    environment:
+      POSTGRES_PASSWORD: durvs01
+      POSTGRES_USER: postgres
+      POSTGRES_DB: 'crud-om30'
+    networks:
+      - app-network
+      
+networks:
+  app-network:
+    driver: bridge

@@ -163,7 +163,7 @@
                 });
                
                 this.axios
-                    .post('http://localhost:8000/api/paciente', data, {
+                    .post('http://127.0.0.1/api/paciente', data, {
                         headers: {
                             'Content-Type': `multipart/form-data`,
                         }
@@ -199,7 +199,7 @@
 
             searchZipCode(event) {
                 let response = this.axios
-                    .get(`http://localhost:8000/api/cep/${this.patient.address.zip_code}`)
+                    .get(`http://127.0.0.1/api/cep/${this.patient.address.zip_code}`)
                     .then(response => {
                         if (response.status === 200) {
                             let data = response.data.data;
