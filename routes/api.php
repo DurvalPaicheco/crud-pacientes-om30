@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\CepController;
 use App\Http\Controllers\PatientsController;
+use App\Http\Controllers\ImportCsvController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -36,6 +37,11 @@ Route::prefix('paciente')->controller(PatientsController::class)->group(function
 
 Route::prefix('cep')->controller(CepController::class)->group(function () {
     Route::get('{cep}', 'getInfoCep');
+});
+
+
+Route::prefix('csv')->controller(ImportCsvController::class)->group(function () {
+    Route::post('import', 'import');
 });
 
 

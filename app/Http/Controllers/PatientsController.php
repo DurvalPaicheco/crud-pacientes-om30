@@ -155,7 +155,7 @@ class PatientsController extends Controller
                 'path_picture' => $data['path_picture'],
             ]);
 
-           
+
             $address = $data['address'];
             $patient->address()->update([
                 'zip_code' => $address['zip_code'],
