@@ -34,4 +34,4 @@ Instalação:
 
 ######  O arquivo de rotas(endpoint.json) se encontra na raiz do projeto.
 
-###### The smallest heading Também é possivél editar configurações do nginx na pasta files/default.conf.  
+###### Também é possivél editar configurações do nginx na pasta files/default.conf.  
